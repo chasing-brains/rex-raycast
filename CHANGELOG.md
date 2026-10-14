@@ -1,15 +1,5 @@
 # Rex Sessions Changelog
 
-## [Repository Setup and Reliability] - 2026-10-14
-
-- Share snapshot reads, event streams, and polling across drill-down views.
-- Recover from stream failures and show refresh errors alongside cached results.
-- Show incomplete host discovery and session reads, and avoid empty-preview flashes when changing panes.
-- Cancel obsolete previews and avoid duplicate captures.
-- Write icon caches atomically and repair incomplete files.
-- Improve unnamed tab titles and host identity handling.
-- Add build artifacts, tagged GitHub releases, and regression checks.
-
 ## [Initial Version] - {PR_MERGE_DATE}
 
 - Search Panes: find any terminal pane across all sessions and hosts by title, program, directory, or agent status
@@ -22,3 +12,5 @@
 - Information preference with Normal, Reduced, and Minimal row detail
 - Jump to a specific pane inside a tab
 - Live refresh while the list is open
+- Shared refresh across drill-down views, recovery from stream failures, and clear warnings when some data is unavailable
+- Canceled obsolete previews, reliable icon caches, and friendly unnamed tab titles
