@@ -16,7 +16,9 @@ Sessions on remote hosts you added with `rex hosts add` appear alongside local o
 
 ## Setup
 
-1. Install Rex. The extension looks for `Rex.app` or `Rex Beta.app` in `/Applications` and `~/Applications`, and falls back to `rex` in `/opt/homebrew/bin` or `/usr/local/bin`. Set the **Rex CLI** preference if yours lives elsewhere; you can point it at the app bundle or at the `rex` binary.
+Rex is currently in private beta; existing beta access is required.
+
+1. Install your copy of Rex. The extension looks for `Rex.app` or `Rex Beta.app` in `/Applications` and `~/Applications`, and falls back to `rex` in `/opt/homebrew/bin` or `/usr/local/bin`. Set the **Rex CLI** preference if yours lives elsewhere; you can point it at the app bundle or at the `rex` binary.
 2. Turn on **Remote Control** in Rex: open Rex → Settings → Rex Server → Remote Control. Without it, jumping still focuses the tab on the server, but the app cannot be told to switch to a different session.
 
 ## Preferences

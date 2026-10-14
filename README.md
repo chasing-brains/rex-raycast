@@ -5,7 +5,7 @@ Search [Rex](https://www.superlogical.com/rex) sessions, tabs, and panes from Ra
 > [!WARNING]
 > This is a fully working prototype, but the code is heavily vibe-coded. Next step is cleaning it up and making better use of Rex's APIs.
 
-Install Rex and enable **Rex → Settings → Rex Server → Remote Control**.
+Requires access to the Rex private beta. Enable **Rex → Settings → Rex Server → Remote Control**.
 
 ```sh
 npm ci

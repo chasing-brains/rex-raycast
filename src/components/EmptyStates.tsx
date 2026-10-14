@@ -8,11 +8,11 @@ export function RexNotFound() {
     <List.EmptyView
       icon={Icon.Terminal}
       title="Rex Not Found"
-      description="Install Rex in /Applications, or point the Rex CLI preference at the rex binary or the app bundle."
+      description="Rex is in private beta. If you have access, install it in /Applications or set the Rex CLI preference."
       actions={
         <ActionPanel>
           <Action title="Open Extension Preferences" icon={Icon.Gear} onAction={openExtensionPreferences} />
-          <Action.OpenInBrowser title="Get Rex" url={REX_HOMEPAGE} />
+          <Action.OpenInBrowser title="Open Rex Website" url={REX_HOMEPAGE} />
         </ActionPanel>
       }
     />
