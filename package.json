@@ -4,7 +4,9 @@
   "title": "Rex Sessions",
   "description": "Find Rex sessions, tabs, and panes on this Mac and your remote hosts, see what runs in each, and jump straight to them",
   "icon": "icon.png",
-  "author": "michal",
+  "author": "mike-the-brain",
+  "owner": "chasing-brains",
+  "access": "public",
   "categories": [
     "Developer Tools",
     "Applications"
