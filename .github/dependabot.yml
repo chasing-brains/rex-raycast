@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dependencies:
+        patterns: ["*"]
+    ignore:
+      # These are exact SDK peers; update them with @raycast/api.
+      - dependency-name: "@types/node"
+      - dependency-name: "@types/react"
+      # @raycast/eslint-config currently requires TypeScript <6.1.
+      - dependency-name: typescript
+        versions: [">=6.1.0"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
