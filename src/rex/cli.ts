@@ -2,12 +2,8 @@ import { getPreferenceValues } from "@raycast/api";
 import { execFile } from "node:child_process";
 import { accessSync, constants, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { appBundleOf, candidatePaths } from "./install-paths";
 import { serverTarget, type RexHost } from "./types";
-
-/** Where the CLI lives inside the Rex app bundle. */
-const HELPER_PATH = "Contents/Helpers/Rex Server.app/Contents/MacOS/rex";
-const APP_BUNDLES = ["Rex.app", "Rex Beta.app"];
 
 export const REX_BUNDLE_ID = "com.superlogical.rex";
 
@@ -56,27 +52,9 @@ function isExecutableFile(path: string): boolean {
   }
 }
 
-function appBundleOf(bin: string): string | undefined {
-  const match = bin.match(/^(.*?\.app)\/Contents\//);
-  return match?.[1];
-}
-
-function candidatePaths(): string[] {
-  const { rexPath } = getPreferenceValues<Preferences>();
-  const candidates: string[] = [];
-  if (rexPath) {
-    candidates.push(rexPath.endsWith(".app") ? join(rexPath, HELPER_PATH) : rexPath);
-  }
-  for (const dir of ["/Applications", join(homedir(), "Applications")]) {
-    for (const bundle of APP_BUNDLES) candidates.push(join(dir, bundle, HELPER_PATH));
-  }
-  candidates.push("/opt/homebrew/bin/rex", "/usr/local/bin/rex");
-  return candidates;
-}
-
 /** Find the rex CLI, honoring the "Rex CLI" preference first. */
 export function locateRex(): RexInstall | undefined {
-  for (const bin of candidatePaths()) {
+  for (const bin of candidatePaths(getPreferenceValues<Preferences>().rexPath, homedir())) {
     if (isExecutableFile(bin)) return { bin, app: appBundleOf(bin) };
   }
   return undefined;
