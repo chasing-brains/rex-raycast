@@ -1,7 +1,8 @@
 import { closeMainWindow, getApplications, getPreferenceValues, open, showHUD } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { REX_BUNDLE_ID, RexError, runRex, type RexInstall } from "./cli";
-import type { RexHost } from "./types";
+import { LOCAL_HOST, sessionKeyOf, type RexHost } from "./types";
+import { rememberShownSession } from "./useOpeningSelection";
 
 export interface JumpTarget {
   /** Server the session lives on. The local server when omitted. */
@@ -64,6 +65,7 @@ export async function performJump(install: RexInstall, target: JumpTarget, label
     await closeMainWindow();
     if (activateApp) await activateRex(install);
     const result = await jumpTo(install, target);
+    if (result.switchedApp) rememberShownSession(sessionKeyOf(target.host ?? LOCAL_HOST, target.sessionId));
     if (result.remoteControlOff) {
       await showHUD(`Focused ${label} · turn on Remote Control in Rex to switch sessions`);
     } else {

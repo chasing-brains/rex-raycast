@@ -10,6 +10,7 @@ import { activityAccessories, FRAME_CYCLE, FRAME_CYCLE_MS, needsFrames } from ".
 import { performJump } from "./rex/jump";
 import { blockStatuses, stateColor, statusLook, summarizeStatuses } from "./rex/status";
 import {
+  activeWindow,
   focusedBlock,
   hostDisplayName,
   hostKey,
@@ -18,6 +19,7 @@ import {
   type RexHost,
   type RexSession,
 } from "./rex/types";
+import { useOpeningSelection } from "./rex/useOpeningSelection";
 import { useRexSnapshot } from "./rex/useSnapshot";
 import { useWorkingFrame } from "./rex/useWorkingFrame";
 
@@ -50,6 +52,7 @@ export default function SearchSessions() {
     FRAME_CYCLE_MS,
     FRAME_CYCLE,
   );
+  const opening = useOpeningSelection(snapshot?.sessions, sessionKey);
 
   if (!install) {
     return (
@@ -64,10 +67,14 @@ export default function SearchSessions() {
   const groups = groupByHost(sessions, snapshot?.hosts ?? []);
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder="Search Rex sessions">
+    <List
+      isLoading={isLoading || !opening.ready}
+      selectedItemId={opening.selectedItemId}
+      searchBarPlaceholder="Search Rex sessions"
+    >
       {error && !snapshot ? (
         <SnapshotFailed error={error} onRetry={revalidate} />
-      ) : snapshot ? (
+      ) : snapshot && opening.ready ? (
         <>
           {groups.map((group) => (
             <List.Section
@@ -112,9 +119,9 @@ interface SessionItemProps {
 }
 
 function SessionItem({ install, session, device, frame, onRefresh }: SessionItemProps) {
-  const activeWindow = session.windows.find((w) => w.windowId === session.activeWindowId) ?? session.windows[0];
-  const focused = activeWindow ? focusedBlock(activeWindow) : undefined;
-  const subtitle = focused ? blockTitle(focused) : activeWindow && windowTitle(activeWindow);
+  const active = activeWindow(session);
+  const focused = active ? focusedBlock(active) : undefined;
+  const subtitle = focused ? blockTitle(focused) : active && windowTitle(active);
   const blocks = session.windows.flatMap((w) => w.blocks);
   const summary = summarizeStatuses(blockStatuses(blocks));
   const title = sessionTitle(session);
@@ -155,7 +162,7 @@ function SessionItem({ install, session, device, frame, onRefresh }: SessionItem
       actions={
         <ActionPanel title={`${title} · ${hostDisplayName(session.host)}`}>
           <ActionPanel.Section>
-            {activeWindow ? (
+            {active ? (
               <Action
                 title="Jump to Session"
                 icon={Icon.ArrowRight}
@@ -165,7 +172,7 @@ function SessionItem({ install, session, device, frame, onRefresh }: SessionItem
                     {
                       host: session.host,
                       sessionId: session.sessionId,
-                      windowId: activeWindow.windowId,
+                      windowId: active.windowId,
                       blockId: focused?.blockId,
                     },
                     title,
