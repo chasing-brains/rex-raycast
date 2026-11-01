@@ -15,7 +15,11 @@ export interface SnapshotState extends SnapshotStoreState {
   revalidate: () => void;
 }
 
-const cache = new Cache();
+/**
+ * A namespace of its own: a Cache rewrites its directory's journal from memory, so two instances in
+ * one directory erase each other's keys, such as useCachedState's preview toggle.
+ */
+const cache = new Cache({ namespace: "snapshot" });
 /** One store per CLI, shared by the command's root view and every view pushed on top of it. */
 const stores = new Map<string, SnapshotStore>();
 

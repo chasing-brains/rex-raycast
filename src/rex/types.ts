@@ -102,7 +102,15 @@ export function shortId(id: string): string {
 
 /** Rex IDs are unique per server, and two host entries may reach the same one, so list keys include the host. */
 export function sessionKey(session: RexSession): string {
-  return `${hostKey(session.host)}/${session.sessionId}`;
+  return sessionKeyOf(session.host, session.sessionId);
+}
+
+export function sessionKeyOf(host: RexHost, sessionId: string): string {
+  return `${hostKey(host)}/${sessionId}`;
+}
+
+export function activeWindow(session: RexSession): RexWindow | undefined {
+  return session.windows.find((window) => window.windowId === session.activeWindowId) ?? session.windows[0];
 }
 
 export function focusedBlock(window: RexWindow): RexBlock | undefined {

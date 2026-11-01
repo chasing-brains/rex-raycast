@@ -15,7 +15,17 @@ import { activityAccessories, FRAME_CYCLE, FRAME_CYCLE_MS, needsFrames } from ".
 import { paneIcon } from "../rex/icons";
 import { performJump } from "../rex/jump";
 import { hostIcon, statusLook } from "../rex/status";
-import { hostDisplayName, sessionKey, shortId, type RexBlock, type RexSession, type RexWindow } from "../rex/types";
+import {
+  activeWindow,
+  focusedBlock,
+  hostDisplayName,
+  sessionKey,
+  shortId,
+  type RexBlock,
+  type RexSession,
+  type RexWindow,
+} from "../rex/types";
+import { useOpeningSelection } from "../rex/useOpeningSelection";
 import { useRexSnapshot } from "../rex/useSnapshot";
 import { useScreenPreview } from "../rex/useScreenPreview";
 import { useWorkingFrame } from "../rex/useWorkingFrame";
@@ -42,6 +52,12 @@ function flatten(sessions: RexSession[]): Pane[] {
 
 function paneItemId({ session, block }: Pane): string {
   return `${sessionKey(session)}/${block.blockId}`;
+}
+
+function focusedPaneItemId(session: RexSession): string | undefined {
+  const window = activeWindow(session);
+  const block = window && focusedBlock(window);
+  return window && block ? paneItemId({ session, window, block }) : undefined;
 }
 
 export interface PaneListProps {
@@ -74,6 +90,7 @@ export function PaneList({ sessionKey: scope, windowId }: PaneListProps = {}) {
     FRAME_CYCLE_MS,
     FRAME_CYCLE,
   );
+  const opening = useOpeningSelection(snapshot?.sessions, focusedPaneItemId, !windowId);
 
   if (!install) {
     return (
@@ -89,7 +106,8 @@ export function PaneList({ sessionKey: scope, windowId }: PaneListProps = {}) {
 
   return (
     <List
-      isLoading={isLoading}
+      isLoading={isLoading || !opening.ready}
+      selectedItemId={opening.selectedItemId}
       isShowingDetail={showDetail && !showEmpty}
       navigationTitle={scopedWindow ? `${sessionTitle(sessions[0])} › ${windowTitle(scopedWindow)}` : undefined}
       searchBarPlaceholder={
@@ -100,7 +118,7 @@ export function PaneList({ sessionKey: scope, windowId }: PaneListProps = {}) {
     >
       {error && !snapshot ? (
         <SnapshotFailed error={error} onRetry={revalidate} />
-      ) : snapshot ? (
+      ) : snapshot && opening.ready ? (
         <>
           {sessions.map((session) => {
             const count = session.windows.reduce((sum, w) => sum + w.blocks.length, 0);

@@ -24,7 +24,16 @@ import {
   shortPath,
   windowTitle,
 } from "../rex/labels";
-import { focusedBlock, hostDisplayName, sessionKey, shortId, type RexSession, type RexWindow } from "../rex/types";
+import {
+  activeWindow,
+  focusedBlock,
+  hostDisplayName,
+  sessionKey,
+  shortId,
+  type RexSession,
+  type RexWindow,
+} from "../rex/types";
+import { useOpeningSelection } from "../rex/useOpeningSelection";
 import { useRexSnapshot } from "../rex/useSnapshot";
 import { useScreenPreview } from "../rex/useScreenPreview";
 import { useWorkingFrame } from "../rex/useWorkingFrame";
@@ -47,6 +56,11 @@ interface Located {
 
 function windowItemId(session: RexSession, window: RexWindow): string {
   return `${sessionKey(session)}/${window.windowId}`;
+}
+
+function activeWindowItemId(session: RexSession): string | undefined {
+  const window = activeWindow(session);
+  return window && windowItemId(session, window);
 }
 
 function locate(sessions: RexSession[], itemId: string | null): Located | undefined {
@@ -87,6 +101,7 @@ export function WindowList({ sessionKey: scope }: WindowListProps) {
     FRAME_CYCLE_MS,
     FRAME_CYCLE,
   );
+  const opening = useOpeningSelection(snapshot?.sessions, activeWindowItemId, !scoped);
 
   if (!install) {
     return (
@@ -120,7 +135,8 @@ export function WindowList({ sessionKey: scope }: WindowListProps) {
 
   return (
     <List
-      isLoading={isLoading}
+      isLoading={isLoading || !opening.ready}
+      selectedItemId={opening.selectedItemId}
       isShowingDetail={showDetail && !showEmpty}
       navigationTitle={scopedSession ? sessionTitle(scopedSession) : undefined}
       searchBarPlaceholder={
@@ -132,7 +148,7 @@ export function WindowList({ sessionKey: scope }: WindowListProps) {
     >
       {error && !snapshot ? (
         <SnapshotFailed error={error} onRetry={revalidate} />
-      ) : snapshot ? (
+      ) : snapshot && opening.ready ? (
         <>
           {sessions.map((session) => (
             <List.Section
